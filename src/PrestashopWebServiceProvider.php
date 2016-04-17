@@ -8,6 +8,8 @@ use Illuminate\Support\ServiceProvider;
 class PrestashopWebServiceProvider extends ServiceProvider
 {
 
+    protected $defer = true;
+
     /**
      * Bootstrap the application services.
      *
@@ -31,6 +33,11 @@ class PrestashopWebServiceProvider extends ServiceProvider
             return new PrestashopWebService(config('prestashop-webservice.url'),
                 config('prestashop-webservice.token', config('prestashop-webservice.debug')));
         });
+    }
+
+    public function provides()
+    {
+        return ['Protechstudio\PrestashopWebService\PrestashopWebService'];
     }
 
     private function publish()
