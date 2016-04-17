@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Protechstudio\PrestashopWebService\PrestashopWebService;
 
 class PrestashopWebServiceTest extends TestCase
 {
@@ -12,6 +13,6 @@ class PrestashopWebServiceTest extends TestCase
      */
     public function it_is_correctly_installed()
     {
-        $this->assertInstanceOf(PrestaShopWebservice::class, Prestashop::getFacadeRoot());
+        $this->assertInstanceOf(PrestashopWebService::class, Prestashop::getFacadeRoot());
     }
 }

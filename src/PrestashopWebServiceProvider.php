@@ -3,7 +3,7 @@
 namespace Protechstudio\PrestashopWebService;
 
 use Illuminate\Support\ServiceProvider;
-use PrestaShopWebservice;
+
 
 class PrestashopWebServiceProvider extends ServiceProvider
 {
@@ -27,8 +27,8 @@ class PrestashopWebServiceProvider extends ServiceProvider
     {
         $this->registerConfig();
 
-        $this->app->singleton(PrestaShopWebservice::class, function () {
-            return new PrestaShopWebservice(config('prestashop-webservice.url'),
+        $this->app->singleton(PrestashopWebService::class, function () {
+            return new PrestashopWebService(config('prestashop-webservice.url'),
                 config('prestashop-webservice.token', config('prestashop-webservice.debug')));
         });
     }
