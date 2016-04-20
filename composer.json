@@ -13,14 +13,7 @@
       "Protechstudio\\PrestashopWebService\\": "src/"
     }
   },
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/Silentscripter/PrestaShop-webservice-lib",
-      "reference": "master"
-    }
-  ],
   "require": {
-    "protechstudio/prestashop-webservice-lib": "dev-master"
+    "protechstudio/prestashop-webservice-lib": "1.*"
   }
 }
