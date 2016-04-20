@@ -21,6 +21,6 @@
     }
   ],
   "require": {
-    "prestashop/prestashop-webservice-lib": "dev-master"
+    "protechstudio/prestashop-webservice-lib": "dev-master"
   }
 }
