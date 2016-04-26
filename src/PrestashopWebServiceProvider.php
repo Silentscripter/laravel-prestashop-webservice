@@ -31,7 +31,7 @@ class PrestashopWebServiceProvider extends ServiceProvider
 
         $this->app->singleton(PrestashopWebService::class, function () {
             return new PrestashopWebService(config('prestashop-webservice.url'),
-                config('prestashop-webservice.token', config('prestashop-webservice.debug')));
+                config('prestashop-webservice.token'), config('prestashop-webservice.debug'));
         });
     }
 
