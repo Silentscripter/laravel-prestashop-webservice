@@ -9,81 +9,8 @@ class PrestashopWebService extends PSLibrary
 {
 
     /**
-     * @param $options
-     * @param bool $assoc
-     * @return mixed
-     * @throws \PrestaShopWebserviceException
-     */
-    public function getJson($options, $assoc = false)
-    {
-        $options = $this->requestJsonOutput($options);
-
-        return json_decode($this->get($options), $assoc);
-    }
-
-    /**
-     * @param $options
-     * @param bool $assoc
-     * @return mixed
-     * @throws \PrestaShopWebserviceException
-     */
-    public function headJson($options, $assoc = false)
-    {
-        $options = $this->requestJsonOutput($options);
-
-        return json_decode($this->head($options), $assoc);
-    }
-
-    /**
-     * @param $options
-     * @param bool $assoc
-     * @return mixed
-     * @throws \PrestaShopWebserviceException
-     */
-    public function addJson($options, $assoc = false)
-    {
-        $options = $this->requestJsonOutput($options);
-
-        return json_decode($this->add($options), $assoc);
-    }
-
-    /**
-     * @param $options
-     * @param bool $assoc
-     * @return mixed
-     * @throws \PrestaShopWebserviceException
-     */
-    public function editJson($options, $assoc = false)
-    {
-        $options = $this->requestJsonOutput($options);
-
-        return json_decode($this->edit($options), $assoc);
-    }
-
-    /**
-     * @param $options
-     * @param bool $assoc
-     * @return mixed
-     */
-    public function deleteJson($options, $assoc = false)
-    {
-        $options = $this->requestJsonOutput($options);
-
-        return json_decode($this->delete($options), $assoc);
-    }
-
-    /**
-     * @param $options
-     * @return mixed
-     */
-    private function requestJsonOutput($options)
-    {
-        $options['output_format'] = 'JSON';
-
-        return $options;
-    }
-
-    /**
+     * Retrieve the resource schema
+     *
      * @param $resource
      * @return SimpleXMLElement
      * @throws \PrestaShopWebserviceException

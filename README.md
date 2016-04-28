@@ -86,7 +86,71 @@ public function bar()
 }
 ```
 
-PS Underlying library usage
+Prestashop Underlying library usage
 ---------------------------
 
 You may find complete documentation and tutorials regarding Prestashop Web Service Library in the [Prestashop Documentation](http://doc.prestashop.com/display/PS16/Using+the+PrestaShop+Web+Service).
+
+Helper methods
+--------------
+
+I've added some helper methods to reduce development time:
+
+### Retrieving resource schema and filling data for posting
+
+You may call `getSchema()` method to retrieve the requested resource schema. You may then fill the schema with an associative array of data with `fillSchema()` method.
+
+```php
+
+$xmlSchema=Prestashop::getSchema('categories'); //returns a SimpleXMLElement instance with the desired schema
+
+$data=[
+    'name'=>'Clothes',
+    'link_rewrite'=>'clothes',
+    'active'=>true
+];
+
+$postXml=Prestashop::fillSchema($xmlSchema,$data); 
+
+//The xml is now ready for being sent back to the web service to create a new category
+
+$response=Prestashop::add(['resource'=>'categories','postXml'=>$postXml->asXml()]);
+
+```
+
+#### Note for language value handling
+
+If the node has a language child you may use a simple string for the value if your shop has only one language installed.
+
+```php
+/*
+    xml node with one language child example
+    ...
+    <name>
+    <language id="1"/>
+    </name>
+    ...
+*/
+$data= ['name'=>Clothes'];
+```
+
+If your shops has more than one language installed you may pass the node value as an array where the key is the language ID.
+
+```php
+/*
+    xml node with n language children example 
+    ...
+    <name>
+    <language id="1"/>
+    <language id="2"/>
+    </name>
+    ... 
+*/
+$data= [
+    'name'=>[
+        1 => 'Clothes',
+        2 => 'Abbigliamento
+    ]
+];
+```
+_Please note that if you don't provide an array of values keyed by the language ID all language values will have the same value._
