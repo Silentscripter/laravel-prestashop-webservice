@@ -29,23 +29,10 @@ class PrestashopWebService extends PSLibrary
      */
     public function fillSchema(SimpleXMLElement $xmlSchema, $data)
     {
-        $toBeRemoved = array();
         $resource = $xmlSchema->children()->children();
-        foreach ($resource as $key => $value) {
-            if (array_key_exists($key, $data)) {
-                if (property_exists($resource->$key, 'language')) {
-                    $this->fillLanguageNode($resource->$key, $data[$key]);
-                } else {
-                    $resource->$key = $data[$key];
-                }
-            } else {
-                $toBeRemoved[] = $key;
-            }
+        foreach ($data as $key => $value) {
+            $this->processNode($resource, $key, $value);
         }
-        foreach ($toBeRemoved as $key) {
-            unset($resource->$key);
-        }
-
         return $xmlSchema;
     }
 
@@ -75,6 +62,24 @@ class PrestashopWebService extends PSLibrary
     {
         for ($i = 0; $i < count($node->language); $i++) {
             $node->language[$i] = $this->getLanguageValue($data, (int)$node->language[$i]['id']->__toString());
+        }
+    }
+
+    /**
+     * @param SimpleXMLElement $node
+     * @param $dataKey
+     * @param $dataValue
+     */
+    private function processNode(SimpleXMLElement $node, $dataKey, $dataValue)
+    {
+        if (property_exists($node->$dataKey, 'language')) {
+            $this->fillLanguageNode($node->$dataKey, $dataValue);
+        } elseif (is_array($dataValue)) {
+            foreach ($dataValue as $key => $value) {
+                $this->processNode($node->$dataKey, $key, $value);
+            }
+        } else {
+            $node->$dataKey = $dataValue;
         }
     }
 }
