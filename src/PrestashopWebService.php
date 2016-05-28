@@ -21,17 +21,21 @@ class PrestashopWebService extends PSLibrary
     }
 
     /**
-     * Fill the provided schema with an associative array data
+     * Fill the provided schema with an associative array data, also remove the useless XML nodes if the corresponding flag is true
      *
      * @param SimpleXMLElement $xmlSchema
      * @param array $data
+     * @param bool $removeUselessNodes set true if you want to remove nodes that are not present in the data array
      * @return SimpleXMLElement
      */
-    public function fillSchema(SimpleXMLElement $xmlSchema, $data)
+    public function fillSchema(SimpleXMLElement $xmlSchema, $data, $removeUselessNodes = true)
     {
         $resource = $xmlSchema->children()->children();
         foreach ($data as $key => $value) {
             $this->processNode($resource, $key, $value);
+        }
+        if ($removeUselessNodes) {
+            $this->checkForUselessNode($resource, $data);
         }
         return $xmlSchema;
     }
@@ -80,6 +84,24 @@ class PrestashopWebService extends PSLibrary
             }
         } else {
             $node->$dataKey = $dataValue;
+        }
+    }
+
+    /**
+     * Remove XML first level nodes that are not present int the data array
+     * @param SimpleXMLElement $resource
+     * @param $data
+     */
+    private function checkForUselessNode(SimpleXMLElement $resource, $data)
+    {
+        $uselessNodes = [];
+        foreach ($resource as $key => $value) {
+            if (!array_key_exists($key, $data)) {
+                $uselessNodes[] = $key;
+            }
+        }
+        foreach ($uselessNodes as $key) {
+            unset($resource->$key);
         }
     }
 }
