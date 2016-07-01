@@ -11,13 +11,13 @@ class PrestashopWebService extends PSLibrary
     /**
      * Retrieve the resource schema
      *
-     * @param $resource
+     * @param $resource , $schema
      * @return SimpleXMLElement
      * @throws \PrestaShopWebserviceException
      */
-    public function getSchema($resource)
+    public function getSchema($resource , $schema = 'blank')
     {
-        return $this->get(['resource' => $resource . '?schema=blank']);
+        return $this->get(['resource' => $resource . "?schema=$schema"]);
     }
 
     /**
