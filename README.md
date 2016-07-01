@@ -6,6 +6,15 @@ Laravel 5 wrapper for Prestashop Web Service Library
 Installation
 ------------
 
+Add these lines to your `composer.json` file at the end of the object:
+
+```javascript
+"minimum-stability":"dev",
+"prefer-stable":"true"
+```
+The `"minimum-stability":"dev"` line is needed because the underlying Prestashop Web Service Library is not versioned so you must tell Composer to allow packages still in development.
+Adding `"prefer-stable":"true"` will tell Composer to provide stable packages if found over dev ones, this is not compulsory but suggested if you don'thave specific needs for your dependencies.
+
 Require this package with composer using the following command:
 
 ```shell
@@ -118,7 +127,25 @@ $response=Prestashop::add(['resource'=>'categories','postXml'=>$postXml->asXml()
 
 ```
 
-#### Note for language value handling
+#### Preserving not filled nodes from removal
+
+The default behaviour for the `fillSchema` method is to remove the nodes that are not filled. If you want to preserve those nodes (typical update situation) put the third parameter as `false`
+
+```php
+$putXml=Prestashop::fillSchema($xmlSchema,$data,false); 
+```
+
+#### Removing specific nodes
+
+When preserving unfilled nodes from removal you may specify some nodes to be removed as the fourth argument (this may be useful when updating a resource with some readonly nodes that would trigger error 400):
+
+```php
+$putXml=Prestashop::fillSchema($xmlSchema,$data,false,['manufacturer_name','quantity']);
+//manufacturer_name and quantity only will be removed from the XML
+```
+
+
+#### Handling language values
 
 If the node has a language child you may use a simple string for the value if your shop has only one language installed.
 
@@ -131,7 +158,7 @@ If the node has a language child you may use a simple string for the value if yo
     </name>
     ...
 */
-$data= ['name'=>Clothes'];
+$data= ['name'=>'Clothes'];
 ```
 
 If your shops has more than one language installed you may pass the node value as an array where the key is the language ID.
@@ -149,8 +176,85 @@ If your shops has more than one language installed you may pass the node value a
 $data= [
     'name'=>[
         1 => 'Clothes',
-        2 => 'Abbigliamento
+        2 => 'Abbigliamento'
     ]
 ];
 ```
 _Please note that if you don't provide an array of values keyed by the language ID all language values will have the same value._
+
+#### Handling associations with several siblings
+
+Provided you got a node with several associations like category association for products or similar as from this extract of product schema:
+
+```xml
+...
+<associations>
+<categories>
+<category>
+<id/>
+</category>
+</categories>
+<product_features>
+<product_feature>
+<id/>
+<id_feature_value/>
+</product_feature>
+</product_features>
+...
+```
+You can prepare the array data map for the `fillSchema` method in this way:
+
+```php
+$data => [
+    ...
+    'associations' => [
+        'categories' =>[
+            [ 'category' => ['id' => 4] ],
+            [ 'category' => ['id' => 5] ],
+            [ 'category' => ['id' => 11] ],
+        ],
+        'product_features' => [
+            [
+                'product_feature' => [
+                    'id' => 5,
+                    'id_feature_value' => 94
+                ]
+            ],
+            [
+                'product_feature' => [
+                    'id' => 1,
+                    'id_feature_value' => 2
+                ]
+            ]
+        ]
+    ]
+]
+```
+The result will be this as expected:
+
+```xml
+...
+<associations>
+    <categories>
+        <category>
+            <id>4</id>
+        </category>
+        <category>
+            <id>5</id>
+        </category>
+        <category>
+            <id>11</id>
+        </category>
+    </categories>
+    <product_features>
+        <product_feature>
+            <id>5</id>
+            <id_feature_value>94</id_feature_value>
+        </product_feature>
+        <product_feature>
+            <id>1</id>
+            <id_feature_value>2</id_feature_value>
+        </product_feature>
+    </product_features>
+...
+```

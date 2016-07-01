@@ -26,16 +26,20 @@ class PrestashopWebService extends PSLibrary
      * @param SimpleXMLElement $xmlSchema
      * @param array $data
      * @param bool $removeUselessNodes set true if you want to remove nodes that are not present in the data array
+     * @param array $removeSpecificNodes If $removeUselessNodes is false you may add here the first level nodes that you want to remove
      * @return SimpleXMLElement
      */
-    public function fillSchema(SimpleXMLElement $xmlSchema, $data, $removeUselessNodes = true)
+    public function fillSchema(SimpleXMLElement $xmlSchema, $data, $removeUselessNodes = true, $removeSpecificNodes=array())
     {
         $resource = $xmlSchema->children()->children();
         foreach ($data as $key => $value) {
             $this->processNode($resource, $key, $value);
         }
         if ($removeUselessNodes) {
-            $this->checkForUselessNode($resource, $data);
+            $this->checkForUselessNodes($resource, $data);
+        }
+        else{
+            $this->removeSpecificNodes($resource,$removeSpecificNodes);
         }
         return $xmlSchema;
     }
@@ -76,7 +80,13 @@ class PrestashopWebService extends PSLibrary
      */
     private function processNode(SimpleXMLElement $node, $dataKey, $dataValue)
     {
-        if (property_exists($node->$dataKey, 'language')) {
+        if(is_int($dataKey)){
+            if($dataKey===0){
+                $this->emptyNode($node);
+            }
+            $this->createNode($node,$dataValue);
+        }
+        elseif (property_exists($node->$dataKey, 'language')) {
             $this->fillLanguageNode($node->$dataKey, $dataValue);
         } elseif (is_array($dataValue)) {
             foreach ($dataValue as $key => $value) {
@@ -92,7 +102,7 @@ class PrestashopWebService extends PSLibrary
      * @param SimpleXMLElement $resource
      * @param $data
      */
-    private function checkForUselessNode(SimpleXMLElement $resource, $data)
+    private function checkForUselessNodes(SimpleXMLElement $resource, $data)
     {
         $uselessNodes = [];
         foreach ($resource as $key => $value) {
@@ -102,6 +112,54 @@ class PrestashopWebService extends PSLibrary
         }
         foreach ($uselessNodes as $key) {
             unset($resource->$key);
+        }
+    }
+
+    /**
+     * Remove the given nodes from the resource
+     * @param $resource
+     * @param $removeSpecificNodes
+     */
+    private function removeSpecificNodes($resource, $removeSpecificNodes)
+    {
+        foreach ($removeSpecificNodes as $node) {
+            unset($resource->$node);
+        }
+    }
+
+    /**
+     * @param SimpleXMLElement $node
+     * @param array $dataValue
+     */
+    private function createNode(SimpleXMLElement $node, $dataValue)
+    {
+        foreach ($dataValue as $key => $value) {
+            if(is_array($value)){
+                if(is_int($key)){
+                    $this->createNode($node,$value);
+                }
+                else{
+                    $childNode=$node->addChild($key);
+                    $this->createNode($childNode,$value);
+                }
+            }
+            else{
+                $node->addChild($key,$value);
+            }
+        }
+    }
+
+    /**
+     * @param SimpleXMLElement $node
+     */
+    private function emptyNode(SimpleXMLElement $node)
+    {
+        $nodeNames = array();
+        foreach ($node->children() as $key => $value) {
+            $nodeNames[]=$key;
+        }
+        foreach ($nodeNames as $nodeName) {
+            unset($node->$nodeName);
         }
     }
 }
