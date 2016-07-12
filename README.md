@@ -9,11 +9,11 @@ Installation
 Add these lines to your `composer.json` file at the end of the object:
 
 ```javascript
-"minimum-stability":"dev",
-"prefer-stable":"true"
+"minimum-stability": "dev",
+"prefer-stable": true
 ```
-The `"minimum-stability":"dev"` line is needed because the underlying Prestashop Web Service Library is not versioned so you must tell Composer to allow packages still in development.
-Adding `"prefer-stable":"true"` will tell Composer to provide stable packages if found over dev ones, this is not compulsory but suggested if you don'thave specific needs for your dependencies.
+The `"minimum-stability": "dev"` line is needed because the underlying Prestashop Web Service Library is not versioned so you must tell Composer to allow packages still in development.
+Adding `"prefer-stable": true` will tell Composer to provide stable packages if found over dev ones, this is not compulsory but suggested if you don'thave specific needs for your dependencies.
 
 Require this package with composer using the following command:
 
