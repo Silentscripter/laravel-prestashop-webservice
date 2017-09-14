@@ -1,32 +1,7 @@
 <?php
-/*
-* 2007-2013 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Open Software License (OSL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/osl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2013 PrestaShop SA
-*  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
-* PrestaShop Webservice Library
-* @package PrestaShopWebservice
-*/
 
 namespace Protechstudio\PrestashopWebService;
+use SimpleXMLElement;
 
 /**
  * @package PrestaShopWebservice
@@ -50,26 +25,27 @@ class PrestashopWebServiceLibrary
 	const psCompatibleVersionsMin = '1.4.0.0';
 	const psCompatibleVersionsMax = '1.7.99.99';
 
-	/**
-	 * PrestaShopWebservice constructor. Throw an exception when CURL is not installed/activated
-	 * <code>
-	 * <?php
-	 * require_once('./PrestaShopWebservice.php');
-	 * try
-	 * {
-	 * 	$ws = new PrestaShopWebservice('http://mystore.com/', 'ZQ88PRJX5VWQHCWE4EE7SQ7HPNX00RAJ', false);
-	 * 	// Now we have a webservice object to play with
-	 * }
-	 * catch (PrestaShopWebserviceException $ex)
-	 * {
-	 * 	echo 'Error : '.$ex->getMessage();
-	 * }
-	 * ?>
-	 * </code>
-	 * @param string $url Root URL for the shop
-	 * @param string $key Authentification key
-	 * @param mixed $debug Debug mode Activated (true) or deactivated (false)
-	*/
+    /**
+     * PrestaShopWebservice constructor. Throw an exception when CURL is not installed/activated
+     * <code>
+     * <?php
+     * require_once('./PrestaShopWebservice.php');
+     * try
+     * {
+     *    $ws = new PrestaShopWebservice('http://mystore.com/', 'ZQ88PRJX5VWQHCWE4EE7SQ7HPNX00RAJ', false);
+     *    // Now we have a webservice object to play with
+     * }
+     * catch (PrestaShopWebserviceException $ex)
+     * {
+     *    echo 'Error : '.$ex->getMessage();
+     * }
+     * ?>
+     * </code>
+     * @param string $url Root URL for the shop
+     * @param string $key Authentification key
+     * @param mixed $debug Debug mode Activated (true) or deactivated (false)
+     * @throws PrestaShopWebserviceException
+     */
 	function __construct($url, $key, $debug = true) {
 		if (!extension_loaded('curl'))
 		  throw new PrestaShopWebserviceException('Please activate the PHP extension \'curl\' to allow use of PrestaShop webservice library');
@@ -79,10 +55,11 @@ class PrestashopWebServiceLibrary
 		$this->version = 'unknown';
 	}
 
-	/**
-	 * Take the status code and throw an exception if the server didn't return 200 or 201 code
-	 * @param int $status_code Status code of an HTTP return
-	 */
+    /**
+     * Take the status code and throw an exception if the server didn't return 200 or 201 code
+     * @param int $status_code Status code of an HTTP return
+     * @throws PrestaShopWebserviceException
+     */
 	protected function checkStatusCode($status_code)
 	{
 		$error_label = 'This call to PrestaShop Web Services failed and returned an HTTP status of %d. That means: %s.';
@@ -98,12 +75,14 @@ class PrestashopWebServiceLibrary
 			default: throw new PrestaShopWebserviceException('This call to PrestaShop Web Services returned an unexpected HTTP status of:' . $status_code);
 		}
 	}
-	/**
-	 * Handles a CURL request to PrestaShop Webservice. Can throw exception.
-	 * @param string $url Resource name
-	 * @param mixed $curl_params CURL parameters (sent to curl_set_opt)
-	 * @return array status_code, response
-	 */
+
+    /**
+     * Handles a CURL request to PrestaShop Webservice. Can throw exception.
+     * @param string $url Resource name
+     * @param mixed $curl_params CURL parameters (sent to curl_set_opt)
+     * @return array status_code, response
+     * @throws PrestaShopWebserviceException
+     */
 	protected function executeRequest($url, $curl_params = array())
 	{
 		$defaultParams = array(
@@ -190,11 +169,12 @@ class PrestashopWebServiceLibrary
 		return $this->version;
 	}
 
-	/**
-	 * Load XML from string. Can throw exception
-	 * @param string $response String from a CURL response
-	 * @return SimpleXMLElement status_code, response
-	 */
+    /**
+     * Load XML from string. Can throw exception
+     * @param string $response String from a CURL response
+     * @return SimpleXMLElement status_code, response
+     * @throws PrestaShopWebserviceException
+     */
 	protected function parseXML($response)
 	{
 		if ($response != '')
@@ -214,15 +194,16 @@ class PrestashopWebServiceLibrary
 			throw new PrestaShopWebserviceException('HTTP response is empty');
 	}
 
-	/**
-	 * Add (POST) a resource
-	 * <p>Unique parameter must take : <br><br>
-	 * 'resource' => Resource name<br>
-	 * 'postXml' => Full XML string to add resource<br><br>
-	 * Examples are given in the tutorial</p>
-	 * @param array $options
-	 * @return SimpleXMLElement status_code, response
-	 */
+    /**
+     * Add (POST) a resource
+     * <p>Unique parameter must take : <br><br>
+     * 'resource' => Resource name<br>
+     * 'postXml' => Full XML string to add resource<br><br>
+     * Examples are given in the tutorial</p>
+     * @param array $options
+     * @return SimpleXMLElement status_code, response
+     * @throws PrestaShopWebserviceException
+     */
 	public function add($options)
 	{
 		$xml = '';
@@ -244,34 +225,35 @@ class PrestashopWebServiceLibrary
 		return self::parseXML($request['response']);
 	}
 
-	/**
- 	 * Retrieve (GET) a resource
-	 * <p>Unique parameter must take : <br><br>
-	 * 'url' => Full URL for a GET request of Webservice (ex: http://mystore.com/api/customers/1/)<br>
-	 * OR<br>
-	 * 'resource' => Resource name,<br>
-	 * 'id' => ID of a resource you want to get<br><br>
-	 * </p>
-	 * <code>
-	 * <?php
-	 * require_once('./PrestaShopWebservice.php');
-	 * try
-	 * {
-	 * $ws = new PrestaShopWebservice('http://mystore.com/', 'ZQ88PRJX5VWQHCWE4EE7SQ7HPNX00RAJ', false);
-	 * $xml = $ws->get(array('resource' => 'orders', 'id' => 1));
-	 *	// Here in $xml, a SimpleXMLElement object you can parse
-	 * foreach ($xml->children()->children() as $attName => $attValue)
-	 * 	echo $attName.' = '.$attValue.'<br />';
-	 * }
-	 * catch (PrestaShopWebserviceException $ex)
-	 * {
-	 * 	echo 'Error : '.$ex->getMessage();
-	 * }
-	 * ?>
-	 * </code>
-	 * @param array $options Array representing resource to get.
-	 * @return SimpleXMLElement status_code, response
-	 */
+    /**
+     * Retrieve (GET) a resource
+     * <p>Unique parameter must take : <br><br>
+     * 'url' => Full URL for a GET request of Webservice (ex: http://mystore.com/api/customers/1/)<br>
+     * OR<br>
+     * 'resource' => Resource name,<br>
+     * 'id' => ID of a resource you want to get<br><br>
+     * </p>
+     * <code>
+     * <?php
+     * require_once('./PrestaShopWebservice.php');
+     * try
+     * {
+     * $ws = new PrestaShopWebservice('http://mystore.com/', 'ZQ88PRJX5VWQHCWE4EE7SQ7HPNX00RAJ', false);
+     * $xml = $ws->get(array('resource' => 'orders', 'id' => 1));
+     *    // Here in $xml, a SimpleXMLElement object you can parse
+     * foreach ($xml->children()->children() as $attName => $attValue)
+     *    echo $attName.' = '.$attValue.'<br />';
+     * }
+     * catch (PrestaShopWebserviceException $ex)
+     * {
+     *    echo 'Error : '.$ex->getMessage();
+     * }
+     * ?>
+     * </code>
+     * @param array $options Array representing resource to get.
+     * @return SimpleXMLElement status_code, response
+     * @throws PrestaShopWebserviceException
+     */
 	public function get($options)
 	{
 		if (isset($options['url']))
@@ -300,12 +282,13 @@ class PrestashopWebServiceLibrary
 		return self::parseXML($request['response']);
 	}
 
-	/**
- 	 * Head method (HEAD) a resource
-	 *
-	 * @param array $options Array representing resource for head request.
-	 * @return SimpleXMLElement status_code, response
-	 */
+    /**
+     * Head method (HEAD) a resource
+     *
+     * @param array $options Array representing resource for head request.
+     * @return SimpleXMLElement status_code, response
+     * @throws PrestaShopWebserviceException
+     */
 	public function head($options)
 	{
 		if (isset($options['url']))
@@ -331,15 +314,18 @@ class PrestashopWebServiceLibrary
 		self::checkStatusCode($request['status_code']);// check the response validity
 		return $request['header'];
 	}
-	/**
-	 * Edit (PUT) a resource
-	 * <p>Unique parameter must take : <br><br>
-	 * 'resource' => Resource name ,<br>
-	 * 'id' => ID of a resource you want to edit,<br>
-	 * 'putXml' => Modified XML string of a resource<br><br>
-	 * Examples are given in the tutorial</p>
-	 * @param array $options Array representing resource to edit.
-	 */
+
+    /**
+     * Edit (PUT) a resource
+     * <p>Unique parameter must take : <br><br>
+     * 'resource' => Resource name ,<br>
+     * 'id' => ID of a resource you want to edit,<br>
+     * 'putXml' => Modified XML string of a resource<br><br>
+     * Examples are given in the tutorial</p>
+     * @param array $options Array representing resource to edit.
+     * @return SimpleXMLElement
+     * @throws PrestaShopWebserviceException
+     */
 	public function edit($options)
 	{
 		$xml = '';
@@ -362,29 +348,30 @@ class PrestashopWebServiceLibrary
 		return self::parseXML($request['response']);
 	}
 
-	/**
-	 * Delete (DELETE) a resource.
-	 * Unique parameter must take : <br><br>
-	 * 'resource' => Resource name<br>
-	 * 'id' => ID or array which contains IDs of a resource(s) you want to delete<br><br>
-	 * <code>
-	 * <?php
-	 * require_once('./PrestaShopWebservice.php');
-	 * try
-	 * {
-	 * $ws = new PrestaShopWebservice('http://mystore.com/', 'ZQ88PRJX5VWQHCWE4EE7SQ7HPNX00RAJ', false);
-	 * $xml = $ws->delete(array('resource' => 'orders', 'id' => 1));
-	 *	// Following code will not be executed if an exception is thrown.
-	 * 	echo 'Successfully deleted.';
-	 * }
-	 * catch (PrestaShopWebserviceException $ex)
-	 * {
-	 * 	echo 'Error : '.$ex->getMessage();
-	 * }
-	 * ?>
-	 * </code>
-	 * @param array $options Array representing resource to delete.
-	 */
+    /**
+     * Delete (DELETE) a resource.
+     * Unique parameter must take : <br><br>
+     * 'resource' => Resource name<br>
+     * 'id' => ID or array which contains IDs of a resource(s) you want to delete<br><br>
+     * <code>
+     * <?php
+     * require_once('./PrestaShopWebservice.php');
+     * try
+     * {
+     * $ws = new PrestaShopWebservice('http://mystore.com/', 'ZQ88PRJX5VWQHCWE4EE7SQ7HPNX00RAJ', false);
+     * $xml = $ws->delete(array('resource' => 'orders', 'id' => 1));
+     *    // Following code will not be executed if an exception is thrown.
+     *    echo 'Successfully deleted.';
+     * }
+     * catch (PrestaShopWebserviceException $ex)
+     * {
+     *    echo 'Error : '.$ex->getMessage();
+     * }
+     * ?>
+     * </code>
+     * @param array $options Array representing resource to delete.
+     * @return bool
+     */
 	public function delete($options)
 	{
 		if (isset($options['url']))
@@ -405,8 +392,3 @@ class PrestashopWebServiceLibrary
 
 
 }
-
-/**
- * @package PrestaShopWebservice
- */
-class PrestaShopWebserviceException extends \Exception { }
