@@ -12,8 +12,5 @@
     "psr-4": {
       "Protechstudio\\PrestashopWebService\\": "src/"
     }
-  },
-  "require": {
-    "prestashop/prestashop-webservice-lib": "dev-master"
   }
 }

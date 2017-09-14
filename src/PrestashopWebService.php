@@ -5,7 +5,7 @@ namespace Protechstudio\PrestashopWebService;
 use PrestaShopWebservice as PSLibrary;
 use SimpleXMLElement;
 
-class PrestashopWebService extends PSLibrary
+class PrestashopWebService extends PrestashopWebServiceLibrary
 {
 
     /**
@@ -13,7 +13,7 @@ class PrestashopWebService extends PSLibrary
      *
      * @param $resource , $schema
      * @return SimpleXMLElement
-     * @throws \PrestaShopWebserviceException
+     * @throws PrestaShopWebserviceException
      */
     public function getSchema($resource , $schema = 'blank')
     {
