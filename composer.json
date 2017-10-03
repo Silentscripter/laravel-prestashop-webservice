@@ -12,5 +12,16 @@
     "psr-4": {
       "Protechstudio\\PrestashopWebService\\": "src/"
     }
-  }
+  },
+  "extra": {
+    "laravel": {
+        "providers": [
+            "Protechstudio\\PrestashopWebService\\PrestashopWebServiceProvider"
+        ],
+        "aliases": {
+            "Prestashop": "Protechstudio\\PrestashopWebService\\PrestashopWebServiceFacade"
+        }
+    }
+}
+  
 }
