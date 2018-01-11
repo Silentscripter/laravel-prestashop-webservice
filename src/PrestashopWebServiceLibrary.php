@@ -22,7 +22,7 @@ class PrestashopWebServiceLibrary
 	protected $version;
 
 	/** @var array compatible versions of PrestaShop Webservice */
-	const psCompatibleVersionsMin = '1.4.0.0';
+	const psCompatibleVersionsMin = '1.6.0.0';
 	const psCompatibleVersionsMax = '1.7.99.99';
 
     /**
