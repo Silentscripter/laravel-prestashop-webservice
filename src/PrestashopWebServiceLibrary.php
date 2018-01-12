@@ -177,8 +177,7 @@ class PrestashopWebServiceLibrary
 	 */
 	protected function parseResponse($response, $output = 'XML')
 	{
-		if ($response !== '')
-		{
+		if ($response !== '') {
             if ($output === 'XML') {
                 return self::parseXML($response);
             } else if($output === 'JSON') {
@@ -186,9 +185,9 @@ class PrestashopWebServiceLibrary
             } else {
                 throw new PrestaShopWebserviceException('Not select a correct output.');
             }
-		}
-		else
-			throw new PrestaShopWebserviceException('HTTP response is empty');
+		} else {
+            throw new PrestaShopWebserviceException('HTTP response is empty');
+        }
 	}
 
 	/**
@@ -199,21 +198,19 @@ class PrestashopWebServiceLibrary
 	 */
 	protected function parseXML($response)
 	{
-		if ($response != '')
-		{
+		if ($response != '') {
 			libxml_clear_errors();
 			libxml_use_internal_errors(true);
 			$xml = simplexml_load_string($response,'SimpleXMLElement', LIBXML_NOCDATA);
-			if (libxml_get_errors())
-			{
+			if (libxml_get_errors()) {
 				$msg = var_export(libxml_get_errors(), true);
 				libxml_clear_errors();
 				throw new PrestaShopWebserviceException('HTTP XML response is not parsable: '.$msg);
 			}
 			return $xml;
-		}
-		else
-			throw new PrestaShopWebserviceException('HTTP response is empty');
+		} else {
+            throw new PrestaShopWebserviceException('HTTP response is empty');
+        }
 	}
 
     /**
@@ -223,16 +220,15 @@ class PrestashopWebServiceLibrary
 	 */
 	protected function parseJSON($response)
 	{
-		if ($response != '')
-		{
+		if ($response != '') {
 			if (json_decode ($response, true)) {
                 return json_decode ($response, true);
             } else {
-                throw new PrestaShopWebserviceException('Error when parse json to array');
+                return $response;
             }
-		}
-		else
-			throw new PrestaShopWebserviceException('HTTP response is empty');
+		} else {
+            throw new PrestaShopWebserviceException('HTTP response is empty');
+        }
 	}
 
     /**
