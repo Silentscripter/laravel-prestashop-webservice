@@ -224,7 +224,7 @@ class PrestashopWebServiceLibrary
             if (json_decode($response, true)) {
                 return json_decode($response, true);
             } else {
-                return '';
+                throw new PrestaShopWebserviceException('Error when parse json to array');
             }
         } else {
             throw new PrestaShopWebserviceException('HTTP response is empty');
