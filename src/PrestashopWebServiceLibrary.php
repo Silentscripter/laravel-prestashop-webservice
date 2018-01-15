@@ -170,66 +170,66 @@ class PrestashopWebServiceLibrary
 	}
 
     /**
-	 * Load XML from string. Can throw exception
-	 * @param string $response String from a CURL response
-	 * @param string $output String two options: XML or JSON
-	 * @return function parseXML or parseJSON
-	 */
-	protected function parseResponse($response, $output = 'XML')
-	{
-		if ($response !== '') {
+    * Load XML from string. Can throw exception
+    * @param string $response String from a CURL response
+    * @param string $output String two options: XML or JSON
+    * @return function parseXML or parseJSON
+    */
+    protected function parseResponse($response, $output = 'XML')
+    {
+        if ($response !== '') {
             if ($output === 'XML') {
                 return self::parseXML($response);
-            } else if($output === 'JSON') {
+            } elseif ($output === 'JSON') {
                 return self::parseJSON($response);
             } else {
                 throw new PrestaShopWebserviceException('Not select a correct output.');
             }
-		} else {
+        } else {
             throw new PrestaShopWebserviceException('HTTP response is empty');
         }
-	}
-
-	/**
-	 * Load XML from string. Can throw exception
-	 * @param string $response String from a CURL response
-	 * @return SimpleXMLElement status_code, response
-	 * @throws PrestaShopWebserviceException
-	 */
-	protected function parseXML($response)
-	{
-		if ($response != '') {
-			libxml_clear_errors();
-			libxml_use_internal_errors(true);
-			$xml = simplexml_load_string($response,'SimpleXMLElement', LIBXML_NOCDATA);
-			if (libxml_get_errors()) {
-				$msg = var_export(libxml_get_errors(), true);
-				libxml_clear_errors();
-				throw new PrestaShopWebserviceException('HTTP XML response is not parsable: '.$msg);
-			}
-			return $xml;
-		} else {
-            throw new PrestaShopWebserviceException('HTTP response is empty');
-        }
-	}
+    }
 
     /**
-	 * Load XML from string. Can throw exception
-	 * @param string $response String from a CURL response
-	 * @return JSONElement status_code, response
-	 */
-	protected function parseJSON($response)
-	{
-		if ($response != '') {
-			if (json_decode ($response, true)) {
-                return json_decode ($response, true);
-            } else {
-                return $response;
+    * Load XML from string. Can throw exception
+    * @param string $response String from a CURL response
+    * @return SimpleXMLElement status_code, response
+    * @throws PrestaShopWebserviceException
+    */
+    protected function parseXML($response)
+    {
+        if ($response != '') {
+            libxml_clear_errors();
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string($response, 'SimpleXMLElement', LIBXML_NOCDATA);
+            if (libxml_get_errors()) {
+                $msg = var_export(libxml_get_errors(), true);
+                libxml_clear_errors();
+                throw new PrestaShopWebserviceException('HTTP XML response is not parsable: ' . $msg);
             }
-		} else {
+            return $xml;
+        } else {
             throw new PrestaShopWebserviceException('HTTP response is empty');
         }
-	}
+    }
+
+    /**
+    * Load XML from string. Can throw exception
+    * @param string $response String from a CURL response
+    * @return JSONElement status_code, response
+    */
+    protected function parseJSON($response)
+    {
+        if ($response != '') {
+            if (json_decode($response, true)) {
+                return json_decode($response, true);
+            } else {
+                return '';
+            }
+        } else {
+            throw new PrestaShopWebserviceException('HTTP response is empty');
+        }
+    }
 
     /**
      * Add (POST) a resource
