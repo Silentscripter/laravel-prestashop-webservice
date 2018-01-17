@@ -227,7 +227,6 @@ class PrestashopWebServiceLibrary
             } else {
                 throw new PrestaShopWebserviceException('Error when parse json to array');
             }
-
         } else {
             throw new PrestaShopWebserviceException('HTTP response is empty');
         }
@@ -255,13 +254,13 @@ class PrestashopWebServiceLibrary
 				$url .= '&id_shop='.$options['id_shop'];
 			if (isset($options['id_group_shop']))
 				$url .= '&id_group_shop='.$options['id_group_shop'];
-            $outputFormat =
-                (isset($options['output_format']) === true)
-                ? $options['output_format']
-                : 'XML';
 		}
 		else
-			throw new PrestaShopWebserviceException('Bad parameters given');
+            throw new PrestaShopWebserviceException('Bad parameters given');
+        $outputFormat =
+            (isset($options['output_format']) === true)
+            ? $options['output_format']
+            : 'XML';
 		$request = self::executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'POST', CURLOPT_POSTFIELDS => $xml));
 
 		self::checkStatusCode($request['status_code']);
@@ -315,15 +314,13 @@ class PrestashopWebServiceLibrary
 						$url_params[$k] = $options[$k];
 			if (count($url_params) > 0)
 				$url .= '?'.http_build_query($url_params);
-
-			$outputFormat =
-                (isset($options['output_format']) === true)
-                ? $options['output_format']
-                : 'XML';
 		}
 		else
 			throw new PrestaShopWebserviceException('Bad parameters given');
-
+        $outputFormat =
+            (isset($options['output_format']) === true)
+            ? $options['output_format']
+            : 'XML';
 		$request = self::executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'GET'));
 
 		self::checkStatusCode($request['status_code']);// check the response validity
@@ -387,15 +384,13 @@ class PrestashopWebServiceLibrary
 				$url .= '&id_shop='.$options['id_shop'];
 			if (isset($options['id_group_shop']))
 				$url .= '&id_group_shop='.$options['id_group_shop'];
-			
-			$outputFormat =
-                (isset($options['output_format']) === true)
-                ? $options['output_format']
-                : 'XML';
 		}
 		else
 			throw new PrestaShopWebserviceException('Bad parameters given');
-
+        $outputFormat =
+            (isset($options['output_format']) === true)
+            ? $options['output_format']
+            : 'XML';
 		$request = self::executeRequest($url,  array(CURLOPT_CUSTOMREQUEST => 'PUT', CURLOPT_POSTFIELDS => $xml));
 		self::checkStatusCode($request['status_code']);// check the response validity
 		return self::parseResponse($request['response'], $outputFormat);
