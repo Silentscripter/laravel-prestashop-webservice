@@ -221,11 +221,13 @@ class PrestashopWebServiceLibrary
     protected function parseJSON($response)
     {
         if ($response != '') {
-            if (json_decode($response, true)) {
+            json_decode($response, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
                 return json_decode($response, true);
             } else {
                 throw new PrestaShopWebserviceException('Error when parse json to array');
             }
+
         } else {
             throw new PrestaShopWebserviceException('HTTP response is empty');
         }
@@ -253,13 +255,17 @@ class PrestashopWebServiceLibrary
 				$url .= '&id_shop='.$options['id_shop'];
 			if (isset($options['id_group_shop']))
 				$url .= '&id_group_shop='.$options['id_group_shop'];
+            $outputFormat =
+                (isset($options['output_format']) === true)
+                ? $options['output_format']
+                : 'XML';
 		}
 		else
 			throw new PrestaShopWebserviceException('Bad parameters given');
 		$request = self::executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'POST', CURLOPT_POSTFIELDS => $xml));
 
 		self::checkStatusCode($request['status_code']);
-		return self::parseXML($request['response']);
+		return self::parseResponse($request['response'], $outputFormat);
 	}
 
     /**
