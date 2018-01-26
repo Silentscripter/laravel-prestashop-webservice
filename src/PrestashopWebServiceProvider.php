@@ -4,7 +4,6 @@ namespace Protechstudio\PrestashopWebService;
 
 use Illuminate\Support\ServiceProvider;
 
-
 class PrestashopWebServiceProvider extends ServiceProvider
 {
 
@@ -30,8 +29,11 @@ class PrestashopWebServiceProvider extends ServiceProvider
         $this->registerConfig();
 
         $this->app->singleton(PrestashopWebService::class, function () {
-            return new PrestashopWebService(config('prestashop-webservice.url'),
-                config('prestashop-webservice.token'), config('prestashop-webservice.debug'));
+            return new PrestashopWebService(
+                config('prestashop-webservice.url'),
+                config('prestashop-webservice.token'),
+                config('prestashop-webservice.debug')
+            );
         });
     }
 
@@ -45,7 +47,6 @@ class PrestashopWebServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/config.php' => config_path('prestashop-webservice.php'),
         ], 'config');
-
     }
 
     private function registerConfig()

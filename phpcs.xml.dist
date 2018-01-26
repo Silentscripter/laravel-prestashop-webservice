@@ -5,6 +5,7 @@
 
     <exclude-pattern>vendor/*</exclude-pattern>
 
+    <rule ref="PSR1" />
     <rule ref="PSR2" />
 
 </ruleset>
