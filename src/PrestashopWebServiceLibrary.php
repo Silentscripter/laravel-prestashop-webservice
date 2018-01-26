@@ -22,6 +22,9 @@ class PrestashopWebServiceLibrary
     /** @var string PS version */
     protected $version;
 
+    /** @var boolean Are we running in a console */
+    protected $runningInConsole;
+
     /** @var array compatible versions of PrestaShop Webservice */
     const PS_COMPATIBLE_VERSION_MIN = '1.4.0.0';
     const PS_COMPATIBLE_VERSION_MAX = '1.7.99.99';
@@ -57,6 +60,8 @@ class PrestashopWebServiceLibrary
         $this->key = $key;
         $this->debug = $debug;
         $this->version = 'unknown';
+        
+        $this->runningInConsole = app()->runningInConsole();
     }
 
     /**
@@ -163,32 +168,39 @@ class PrestashopWebServiceLibrary
             }
         }
 
-        if ($this->debug) {
-            $this->printDebug('HTTP REQUEST HEADER', curl_getinfo($session, CURLINFO_HEADER_OUT));
-            $this->printDebug('HTTP RESPONSE HEADER', $header);
-        }
+        $this->printDebug('HTTP REQUEST HEADER', curl_getinfo($session, CURLINFO_HEADER_OUT));
+        $this->printDebug('HTTP RESPONSE HEADER', $header);
+
         $status_code = curl_getinfo($session, CURLINFO_HTTP_CODE);
         if ($status_code === 0) {
             throw new PrestaShopWebserviceException('CURL Error: '.curl_error($session));
         }
         curl_close($session);
-        if ($this->debug) {
-            if ($curl_params[CURLOPT_CUSTOMREQUEST] == 'PUT' || $curl_params[CURLOPT_CUSTOMREQUEST] == 'POST') {
-                $this->printDebug('XML SENT', urldecode($curl_params[CURLOPT_POSTFIELDS]));
-            }
-            if ($curl_params[CURLOPT_CUSTOMREQUEST] != 'DELETE' && $curl_params[CURLOPT_CUSTOMREQUEST] != 'HEAD') {
-                $this->printDebug('RETURN HTTP BODY', $body);
-            }
+
+        if ($curl_params[CURLOPT_CUSTOMREQUEST] == 'PUT' || $curl_params[CURLOPT_CUSTOMREQUEST] == 'POST') {
+            $this->printDebug('XML SENT', urldecode($curl_params[CURLOPT_POSTFIELDS]));
+        }
+        if ($curl_params[CURLOPT_CUSTOMREQUEST] != 'DELETE' && $curl_params[CURLOPT_CUSTOMREQUEST] != 'HEAD') {
+            $this->printDebug('RETURN HTTP BODY', $body);
         }
         return array('status_code' => $status_code, 'response' => $body, 'header' => $header);
     }
 
     public function printDebug($title, $content)
     {
-        echo '<div style="display:table;background:#CCC;font-size:8pt;padding:7px">';
-        echo '<h6 style="font-size:9pt;margin:0">'.$title.'</h6>';
-        echo '<pre>'.htmlentities($content).'</pre>';
-        echo '</div>';
+        if ($this->debug) {
+            if ($this->runningInConsole) {
+                echo 'START '.$title."\n";
+                echo $content . "\n";
+                echo 'END '.$title."\n";
+                echo "\n";
+            } else {
+                echo '<div style="display:table;background:#CCC;font-size:8pt;padding:7px">';
+                echo '<h6 style="font-size:9pt;margin:0">'.$title.'</h6>';
+                echo '<pre>'.htmlentities($content).'</pre>';
+                echo '</div>';
+            }
+        }
     }
 
     public function getVersion()
