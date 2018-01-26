@@ -257,10 +257,10 @@ class PrestashopWebServiceLibrary
         } else {
             throw new PrestaShopWebserviceException('Bad parameters given');
         }
-        $request = self::executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'POST', CURLOPT_POSTFIELDS => $xml));
+        $request = $this->executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'POST', CURLOPT_POSTFIELDS => $xml));
 
-        self::checkStatusCode($request['status_code']);
-        return self::parseXML($request['response']);
+        $this->checkStatusCode($request['status_code']);
+        return $this->parseXML($request['response']);
     }
 
     /**
@@ -318,10 +318,10 @@ class PrestashopWebServiceLibrary
             throw new PrestaShopWebserviceException('Bad parameters given');
         }
 
-        $request = self::executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'GET'));
+        $request = $this->executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'GET'));
 
-        self::checkStatusCode($request['status_code']);// check the response validity
-        return self::parseXML($request['response']);
+        $this->checkStatusCode($request['status_code']);// check the response validity
+        return $this->parseXML($request['response']);
     }
 
     /**
@@ -356,8 +356,8 @@ class PrestashopWebServiceLibrary
         } else {
             throw new PrestaShopWebserviceException('Bad parameters given');
         }
-        $request = self::executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'HEAD', CURLOPT_NOBODY => true));
-        self::checkStatusCode($request['status_code']);// check the response validity
+        $request = $this->executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'HEAD', CURLOPT_NOBODY => true));
+        $this->checkStatusCode($request['status_code']);// check the response validity
         return $request['header'];
     }
 
@@ -394,9 +394,9 @@ class PrestashopWebServiceLibrary
             throw new PrestaShopWebserviceException('Bad parameters given');
         }
 
-        $request = self::executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'PUT', CURLOPT_POSTFIELDS => $xml));
-        self::checkStatusCode($request['status_code']);// check the response validity
-        return self::parseXML($request['response']);
+        $request = $this->executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'PUT', CURLOPT_POSTFIELDS => $xml));
+        $this->checkStatusCode($request['status_code']);// check the response validity
+        return $this->parseXML($request['response']);
     }
 
     /**
@@ -440,8 +440,8 @@ class PrestashopWebServiceLibrary
         if (isset($options['id_group_shop'])) {
             $url .= '&id_group_shop='.$options['id_group_shop'];
         }
-        $request = self::executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'DELETE'));
-        self::checkStatusCode($request['status_code']);// check the response validity
+        $request = $this->executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'DELETE'));
+        $this->checkStatusCode($request['status_code']);// check the response validity
         return true;
     }
 }
