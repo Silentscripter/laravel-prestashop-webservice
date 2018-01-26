@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'url' => 'http://domain.com',
-    'token' => '',
+    'url' => env('PRESTASHOP_URL', 'http://domain.com'),
+    'token' => env('PRESTASHOP_TOKEN', ''),
     'debug' => env('APP_DEBUG', false)
 ];
