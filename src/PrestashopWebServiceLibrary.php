@@ -102,7 +102,23 @@ class PrestashopWebServiceLibrary
     }
 
     /**
-     * Handles a CURL request to PrestaShop Webservice. Can throw exception.
+     * Throws exception if prestashop version is not supported
+     * @param int $version The prestashop version
+     * @throws PrestaShopWebserviceException
+     */
+    public function isPrestashopVersionSupported($version)
+    {
+        if (version_compare($version, self::PS_COMPATIBLE_VERSION_MIN, '>=') === false ||
+            version_compare($version, self::PS_COMPATIBLE_VERSION_MAX, '<=') === false
+        ) {
+            $exception = 'This library is not compatible with this version of PrestaShop. ';
+            $exception.= 'Please upgrade/downgrade this library';
+            throw new PrestaShopWebserviceException($exception);
+        }
+    }
+
+    /**
+     * Prepares and validate a CURL request to PrestaShop Webservice. Can throw exception.
      * @param string $url Resource name
      * @param mixed $curl_params CURL parameters (sent to curl_set_opt)
      * @return array status_code, response
@@ -119,8 +135,6 @@ class PrestashopWebServiceLibrary
             CURLOPT_HTTPHEADER => array( 'Expect:' )
         );
 
-        $session = curl_init($url);
-
         $curl_options = array();
         foreach ($defaultParams as $defkey => $defval) {
             if (isset($curl_params[$defkey])) {
@@ -135,47 +149,37 @@ class PrestashopWebServiceLibrary
             }
         }
 
-        curl_setopt_array($session, $curl_options);
-        $response = curl_exec($session);
+        list($response, $info, $error) = $this->executeCurl($url, $curl_options);
 
-        $index = strpos($response, "\r\n\r\n");
-        if ($index === false && $curl_params[CURLOPT_CUSTOMREQUEST] != 'HEAD') {
+        $status_code = $info['http_code'];
+        if ($status_code === 0 || $error) {
+            throw new PrestaShopWebserviceException('CURL Error: '.$error);
+        }
+
+        $index = $info['header_size'];
+        if ($index === false && $curl_params[CURLOPT_CUSTOMREQUEST] !== 'HEAD') {
             throw new PrestaShopWebserviceException('Bad HTTP response');
         }
 
         $header = substr($response, 0, $index);
-        $body = substr($response, $index + 4);
-
-        $headerArrayTmp = explode("\n", $header);
+        $body = substr($response, $index);
 
         $headerArray = array();
-        foreach ($headerArrayTmp as &$headerItem) {
-            $tmp = explode(':', $headerItem);
-            $tmp = array_map('trim', $tmp);
-            if (count($tmp) == 2) {
+        foreach (explode("\n", $header) as $headerItem) {
+            $tmp = explode(':', $headerItem, 2);
+            if (count($tmp) === 2) {
+                $tmp = array_map('trim', $tmp);
                 $headerArray[$tmp[0]] = $tmp[1];
             }
         }
 
         if (array_key_exists('PSWS-Version', $headerArray)) {
+            $this->isPrestashopVersionSupported($headerArray['PSWS-Version']);
             $this->version = $headerArray['PSWS-Version'];
-            if (version_compare(PrestaShopWebservice::PS_COMPATIBLE_VERSION_MIN, $headerArray['PSWS-Version']) == 1 ||
-                version_compare(PrestaShopWebservice::PS_COMPATIBLE_VERSION_MAX, $headerArray['PSWS-Version']) == -1
-            ) {
-                $exception = 'This library is not compatible with this version of PrestaShop. ';
-                $exception.= 'Please upgrade/downgrade this library';
-                throw new PrestaShopWebserviceException($exception);
-            }
         }
 
-        $this->printDebug('HTTP REQUEST HEADER', curl_getinfo($session, CURLINFO_HEADER_OUT));
+        $this->printDebug('HTTP REQUEST HEADER', $info['request_header']);
         $this->printDebug('HTTP RESPONSE HEADER', $header);
-
-        $status_code = curl_getinfo($session, CURLINFO_HTTP_CODE);
-        if ($status_code === 0) {
-            throw new PrestaShopWebserviceException('CURL Error: '.curl_error($session));
-        }
-        curl_close($session);
 
         if ($curl_params[CURLOPT_CUSTOMREQUEST] == 'PUT' || $curl_params[CURLOPT_CUSTOMREQUEST] == 'POST') {
             $this->printDebug('XML SENT', urldecode($curl_params[CURLOPT_POSTFIELDS]));
@@ -183,7 +187,41 @@ class PrestashopWebServiceLibrary
         if ($curl_params[CURLOPT_CUSTOMREQUEST] != 'DELETE' && $curl_params[CURLOPT_CUSTOMREQUEST] != 'HEAD') {
             $this->printDebug('RETURN HTTP BODY', $body);
         }
-        return array('status_code' => $status_code, 'response' => $body, 'header' => $header);
+
+        return array(
+            'status_code' => $status_code,
+            'response' => $body,
+            'header' => $header,
+            'headers' => $headerArray
+            );
+    }
+
+    /**
+     * Executes the CURL request to PrestaShop Webservice.
+     * @param string $url Resource name
+     * @param mixed $options CURL parameters (sent to curl_setopt_array)
+     * @return array response, info
+     */
+    protected function executeCurl($url, array $options = array())
+    {
+        $session = curl_init($url);
+
+        if (count($options)) {
+            curl_setopt_array($session, $options);
+        }
+
+        $response = curl_exec($session);
+
+        $error = false;
+        if ($response === false) {
+            $error = curl_error($session);
+        } else {
+            $info = curl_getinfo($session);
+        }
+
+        curl_close($session);
+
+        return array($response, $info, $error);
     }
 
     public function printDebug($title, $content)
