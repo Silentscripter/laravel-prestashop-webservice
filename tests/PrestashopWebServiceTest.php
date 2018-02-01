@@ -3,7 +3,8 @@
 namespace Protechstudio\PrestashopWebService\Tests;
 
 use Protechstudio\PrestashopWebService\PrestashopWebService;
-use Protechstudio\PrestashopWebService\PrestashopWebServiceException;
+use Protechstudio\PrestashopWebService\Exceptions\PrestashopWebServiceException;
+use Protechstudio\PrestashopWebService\Exceptions\PrestashopWebServiceRequestException;
 use Protechstudio\PrestashopWebService\PrestashopWebServiceLibrary;
 use Prestashop;
 
@@ -32,12 +33,25 @@ class PrestashopWebServiceTest extends TestCase
     {
         $ps = $this->getMockedLibrary('executeRequest', [
                 'status_code' => 404,
-                'response' => '',
+                'response' => '<?xml version="1.0" encoding="UTF-8"?>
+<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
+<errors>
+<error>
+<code><![CDATA[1]]></code>
+<message><![CDATA[Invalid ID]]></message>
+</error>
+</errors>
+</prestashop>',
                 'header' => ''
             ]);
 
-        $this->expectException(PrestashopWebServiceException::class);
-        $xml = $ps->get(['resource' => 'categories']);
+        try {
+            $xml = $ps->get(['resource' => 'categories']);
+        } catch (PrestashopWebServiceRequestException $exception) {
+            $this->assertEquals(404, $exception->getCode());
+            $this->assertTrue($exception->hasResponse());
+            $this->assertEquals('Invalid ID', (string)$exception->getResponse()->errors->error->message);
+        }
     }
 
     /** @test */
