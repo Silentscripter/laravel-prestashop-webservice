@@ -55,6 +55,21 @@ class PrestashopWebServiceTest extends TestCase
     }
 
     /** @test */
+    public function it_throws_exception_on_unknown_http_status()
+    {
+        $ps = $this->getMockedLibrary('executeRequest', [
+                'status_code' => 999,
+                'response' => '<?xml version="1.0" encoding="UTF-8"?>
+<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
+</prestashop>',
+                'header' => ''
+            ]);
+
+        $this->expectExceptionMessage('unexpected HTTP status of: 999', PrestashopWebServiceException::class);
+        $xml = $ps->get(['resource' => 'categories']);
+    }
+
+    /** @test */
     public function it_throws_exception_on_empty_response()
     {
         $ps = $this->getMockedLibrary('executeRequest', [

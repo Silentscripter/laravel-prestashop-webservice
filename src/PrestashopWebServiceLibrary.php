@@ -97,7 +97,7 @@ class PrestashopWebServiceLibrary
             throw new PrestashopWebServiceRequestException($messages[$request['status_code']], $request['status_code'], $xml);
         } else {
             $exception = 'This call to PrestaShop Web Services returned an unexpected HTTP status of: ';
-            $exception.= $status_code;
+            $exception.= $request['status_code'];
             throw new PrestashopWebServiceException($exception);
         }
     }
