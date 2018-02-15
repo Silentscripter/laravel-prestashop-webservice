@@ -19,7 +19,7 @@ class PrestashopWebServiceTest extends TestCase
     /** @test */
     public function test_request_is_correct()
     {
-        $requestResponseStub = require('requests/category-schema.php');
+        $requestResponseStub = require(__DIR__.'/requests/category-schema.php');
 
          list($header, $body) = explode("\n\n", $requestResponseStub[0], 2);
          $header_size = strlen($header) + 2;
@@ -30,7 +30,7 @@ class PrestashopWebServiceTest extends TestCase
     /** @test */
     public function it_can_perform_a_get_request()
     {
-        $requestResponseStub = require('requests/category-schema.php');
+        $requestResponseStub = require(__DIR__.'/requests/category-schema.php');
         $ps = $this->getMockedLibrary('executeCurl', $requestResponseStub);
 
         $xml = $ps->get(['resource' => 'categories']);
@@ -117,7 +117,7 @@ class PrestashopWebServiceTest extends TestCase
     /** @test */
     public function it_throws_exception_on_unsupported_version_from_request()
     {
-        $requestResponseStub = require('requests/category-schema.php');
+        $requestResponseStub = require(__DIR__.'/requests/category-schema.php');
         $requestResponseStub[0] = preg_replace('/^PSWS-Version:(.+?)$/im', 'PSWS-Version: 99.99.99.9999', $requestResponseStub[0]);
         $ps = $this->getMockedLibrary('executeCurl', $requestResponseStub);
 
