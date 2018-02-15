@@ -17,6 +17,17 @@ class PrestashopWebServiceTest extends TestCase
     }
     
     /** @test */
+    public function test_request_is_correct()
+    {
+        $requestResponseStub = require('requests/category-schema.php');
+
+         list($header, $body) = explode("\n\n", $requestResponseStub[0], 2);
+         $header_size = strlen($header) + 2;
+
+         $this->assertEquals($header_size, $requestResponseStub[1]['header_size']);
+    }
+
+    /** @test */
     public function it_can_perform_a_get_request()
     {
         $requestResponseStub = require('requests/category-schema.php');
