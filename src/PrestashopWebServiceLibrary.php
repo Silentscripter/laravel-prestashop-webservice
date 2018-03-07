@@ -222,6 +222,10 @@ class PrestashopWebServiceLibrary
 		$request = self::executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'POST', CURLOPT_POSTFIELDS => $xml));
 
 		self::checkStatusCode($request['status_code']);
+
+		if (isset($options['rawXmlOutput']) && $options['rawXmlOutput'] == 'true')
+            return $request['response'];
+
 		return self::parseXML($request['response']);
 	}
 
@@ -279,6 +283,10 @@ class PrestashopWebServiceLibrary
 		$request = self::executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'GET'));
 
 		self::checkStatusCode($request['status_code']);// check the response validity
+
+		if (isset($options['rawXmlOutput']) && $options['rawXmlOutput'] == 'true')
+            return $request['response'];
+
 		return self::parseXML($request['response']);
 	}
 
@@ -345,6 +353,10 @@ class PrestashopWebServiceLibrary
 
 		$request = self::executeRequest($url,  array(CURLOPT_CUSTOMREQUEST => 'PUT', CURLOPT_POSTFIELDS => $xml));
 		self::checkStatusCode($request['status_code']);// check the response validity
+
+		if (isset($options['rawXmlOutput']) && $options['rawXmlOutput'] == 'true')
+            return $request['response'];
+        
 		return self::parseXML($request['response']);
 	}
 
