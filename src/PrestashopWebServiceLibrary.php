@@ -22,7 +22,7 @@ class PrestashopWebServiceLibrary
 	protected $version;
 
 	/** @var array compatible versions of PrestaShop Webservice */
-	const psCompatibleVersionsMin = '1.4.0.0';
+	const psCompatibleVersionsMin = '1.6.0.0';
 	const psCompatibleVersionsMax = '1.7.99.99';
 
     /**
@@ -170,29 +170,67 @@ class PrestashopWebServiceLibrary
 	}
 
     /**
-     * Load XML from string. Can throw exception
-     * @param string $response String from a CURL response
-     * @return SimpleXMLElement status_code, response
-     * @throws PrestaShopWebserviceException
-     */
-	protected function parseXML($response)
-	{
-		if ($response != '')
-		{
-			libxml_clear_errors();
-			libxml_use_internal_errors(true);
-			$xml = simplexml_load_string($response,'SimpleXMLElement', LIBXML_NOCDATA);
-			if (libxml_get_errors())
-			{
-				$msg = var_export(libxml_get_errors(), true);
-				libxml_clear_errors();
-				throw new PrestaShopWebserviceException('HTTP XML response is not parsable: '.$msg);
-			}
-			return $xml;
-		}
-		else
-			throw new PrestaShopWebserviceException('HTTP response is empty');
-	}
+    * Load XML from string. Can throw exception
+    * @param string $response String from a CURL response
+    * @param string $output String two options: XML or JSON
+    * @return function parseXML or parseJSON
+    */
+    protected function parseResponse($response, $output = 'XML')
+    {
+        if ($response !== '') {
+            if ($output === 'XML') {
+                return self::parseXML($response);
+            } elseif ($output === 'JSON') {
+                return self::parseJSON($response);
+            } else {
+                throw new PrestaShopWebserviceException('Not select a correct output.');
+            }
+        } else {
+            throw new PrestaShopWebserviceException('HTTP response is empty');
+        }
+    }
+
+    /**
+    * Load XML from string. Can throw exception
+    * @param string $response String from a CURL response
+    * @return SimpleXMLElement status_code, response
+    * @throws PrestaShopWebserviceException
+    */
+    protected function parseXML($response)
+    {
+        if ($response != '') {
+            libxml_clear_errors();
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string($response, 'SimpleXMLElement', LIBXML_NOCDATA);
+            if (libxml_get_errors()) {
+                $msg = var_export(libxml_get_errors(), true);
+                libxml_clear_errors();
+                throw new PrestaShopWebserviceException('HTTP XML response is not parsable: ' . $msg);
+            }
+            return $xml;
+        } else {
+            throw new PrestaShopWebserviceException('HTTP response is empty');
+        }
+    }
+
+    /**
+    * Load XML from string. Can throw exception
+    * @param string $response String from a CURL response
+    * @return JSONElement status_code, response
+    */
+    protected function parseJSON($response)
+    {
+        if ($response != '') {
+            json_decode($response, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return json_decode($response, true);
+            } else {
+                throw new PrestaShopWebserviceException('Error when parse json to array');
+            }
+        } else {
+            throw new PrestaShopWebserviceException('HTTP response is empty');
+        }
+    }
 
     /**
      * Add (POST) a resource
@@ -218,11 +256,15 @@ class PrestashopWebServiceLibrary
 				$url .= '&id_group_shop='.$options['id_group_shop'];
 		}
 		else
-			throw new PrestaShopWebserviceException('Bad parameters given');
+            throw new PrestaShopWebserviceException('Bad parameters given');
+        $outputFormat =
+            (isset($options['output_format']) === true)
+            ? $options['output_format']
+            : 'XML';
 		$request = self::executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'POST', CURLOPT_POSTFIELDS => $xml));
 
 		self::checkStatusCode($request['status_code']);
-		return self::parseXML($request['response']);
+		return self::parseResponse($request['response'], $outputFormat);
 	}
 
     /**
@@ -265,7 +307,7 @@ class PrestashopWebServiceLibrary
 			if (isset($options['id']))
 				$url .= '/'.$options['id'];
 
-			$params = array('filter', 'display', 'sort', 'limit', 'id_shop', 'id_group_shop','date');
+			$params = array('filter', 'display', 'sort', 'limit', 'id_shop', 'id_group_shop','date', 'output_format');
 			foreach ($params as $p)
 				foreach ($options as $k => $o)
 					if (strpos($k, $p) !== false)
@@ -275,11 +317,14 @@ class PrestashopWebServiceLibrary
 		}
 		else
 			throw new PrestaShopWebserviceException('Bad parameters given');
-
+        $outputFormat =
+            (isset($options['output_format']) === true)
+            ? $options['output_format']
+            : 'XML';
 		$request = self::executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'GET'));
 
 		self::checkStatusCode($request['status_code']);// check the response validity
-		return self::parseXML($request['response']);
+		return self::parseResponse($request['response'], $outputFormat);
 	}
 
     /**
@@ -300,7 +345,7 @@ class PrestashopWebServiceLibrary
 			if (isset($options['id']))
 				$url .= '/'.$options['id'];
 
-			$params = array('filter', 'display', 'sort', 'limit');
+			$params = array('filter', 'display', 'sort', 'limit', 'output_format');
 			foreach ($params as $p)
 				foreach ($options as $k => $o)
 					if (strpos($k, $p) !== false)
@@ -342,10 +387,13 @@ class PrestashopWebServiceLibrary
 		}
 		else
 			throw new PrestaShopWebserviceException('Bad parameters given');
-
+        $outputFormat =
+            (isset($options['output_format']) === true)
+            ? $options['output_format']
+            : 'XML';
 		$request = self::executeRequest($url,  array(CURLOPT_CUSTOMREQUEST => 'PUT', CURLOPT_POSTFIELDS => $xml));
 		self::checkStatusCode($request['status_code']);// check the response validity
-		return self::parseXML($request['response']);
+		return self::parseResponse($request['response'], $outputFormat);
 	}
 
     /**
