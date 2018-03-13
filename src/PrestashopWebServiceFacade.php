@@ -2,7 +2,6 @@
 
 namespace Protechstudio\PrestashopWebService;
 
-
 use Illuminate\Support\Facades\Facade;
 
 class PrestashopWebServiceFacade extends Facade
@@ -12,5 +11,4 @@ class PrestashopWebServiceFacade extends Facade
     {
         return PrestashopWebService::class;
     }
-
 }

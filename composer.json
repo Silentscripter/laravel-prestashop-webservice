@@ -13,6 +13,11 @@
       "Protechstudio\\PrestashopWebService\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Protechstudio\\PrestashopWebService\\Tests\\": "tests/"
+    }
+  },
   "extra": {
     "laravel": {
         "providers": [
@@ -22,6 +27,13 @@
             "Prestashop": "Protechstudio\\PrestashopWebService\\PrestashopWebServiceFacade"
         }
     }
-}
-  
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "^3.2",
+    "Orchestra/Testbench": "^3.5"
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit",
+    "cs": "vendor/bin/phpcs src/*"
+  }
 }

@@ -15,31 +15,36 @@ class PrestashopWebService extends PrestashopWebServiceLibrary
      * @return SimpleXMLElement
      * @throws PrestaShopWebserviceException
      */
-    public function getSchema($resource , $schema = 'blank')
+    public function getSchema($resource, $schema = 'blank')
     {
         return $this->get(['resource' => $resource . "?schema=$schema"]);
     }
 
     /**
-     * Fill the provided schema with an associative array data, also remove the useless XML nodes if the corresponding flag is true
+     * Fill the provided schema with an associative array data, also remove the useless XML nodes if
+     * the corresponding flag is true
      *
      * @param SimpleXMLElement $xmlSchema
      * @param array $data
      * @param bool $removeUselessNodes set true if you want to remove nodes that are not present in the data array
-     * @param array $removeSpecificNodes If $removeUselessNodes is false you may add here the first level nodes that you want to remove
+     * @param array $removeSpecificNodes If $removeUselessNodes is false you may add here the first level nodes that
+     *                                   you want to remove
      * @return SimpleXMLElement
      */
-    public function fillSchema(SimpleXMLElement $xmlSchema, $data, $removeUselessNodes = true, $removeSpecificNodes=array())
-    {
+    public function fillSchema(
+        SimpleXMLElement $xmlSchema,
+        $data,
+        $removeUselessNodes = true,
+        $removeSpecificNodes = array()
+    ) {
         $resource = $xmlSchema->children()->children();
         foreach ($data as $key => $value) {
             $this->processNode($resource, $key, $value);
         }
         if ($removeUselessNodes) {
             $this->checkForUselessNodes($resource, $data);
-        }
-        else{
-            $this->removeSpecificNodes($resource,$removeSpecificNodes);
+        } else {
+            $this->removeSpecificNodes($resource, $removeSpecificNodes);
         }
         return $xmlSchema;
     }
@@ -80,13 +85,12 @@ class PrestashopWebService extends PrestashopWebServiceLibrary
      */
     private function processNode(SimpleXMLElement $node, $dataKey, $dataValue)
     {
-        if(is_int($dataKey)){
-            if($dataKey===0){
+        if (is_int($dataKey)) {
+            if ($dataKey===0) {
                 $this->emptyNode($node);
             }
-            $this->createNode($node,$dataValue);
-        }
-        elseif (property_exists($node->$dataKey, 'language')) {
+            $this->createNode($node, $dataValue);
+        } elseif (property_exists($node->$dataKey, 'language')) {
             $this->fillLanguageNode($node->$dataKey, $dataValue);
         } elseif (is_array($dataValue)) {
             foreach ($dataValue as $key => $value) {
@@ -134,17 +138,15 @@ class PrestashopWebService extends PrestashopWebServiceLibrary
     private function createNode(SimpleXMLElement $node, $dataValue)
     {
         foreach ($dataValue as $key => $value) {
-            if(is_array($value)){
-                if(is_int($key)){
-                    $this->createNode($node,$value);
-                }
-                else{
+            if (is_array($value)) {
+                if (is_int($key)) {
+                    $this->createNode($node, $value);
+                } else {
                     $childNode=$node->addChild($key);
-                    $this->createNode($childNode,$value);
+                    $this->createNode($childNode, $value);
                 }
-            }
-            else{
-                $node->addChild($key,$value);
+            } else {
+                $node->addChild($key, $value);
             }
         }
     }
