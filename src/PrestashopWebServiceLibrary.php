@@ -214,10 +214,9 @@ class PrestashopWebServiceLibrary
         $response = curl_exec($session);
 
         $error = false;
+        $info = curl_getinfo($session);
         if ($response === false) {
             $error = curl_error($session);
-        } else {
-            $info = curl_getinfo($session);
         }
 
         curl_close($session);
