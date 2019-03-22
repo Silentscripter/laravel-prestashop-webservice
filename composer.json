@@ -1,5 +1,5 @@
 {
-  "name": "protechstudio/laravel-prestashop-webservice",
+  "name": "alexszilagyi/laravel-prestashop-webservice",
   "description": "Laravel 5 wrapper for Prestashop Web Service Library",
   "license": "MIT",
   "authors": [
