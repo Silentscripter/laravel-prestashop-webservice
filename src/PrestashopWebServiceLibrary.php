@@ -133,7 +133,9 @@ class PrestashopWebServiceLibrary
             CURLINFO_HEADER_OUT => true,
             CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
             CURLOPT_USERPWD => $this->key.':',
-            CURLOPT_HTTPHEADER => array( 'Expect:' )
+            CURLOPT_HTTPHEADER => array( 'Expect:' ),
+            CURLOPT_SSL_VERIFYPEER => !(env('APP_ENV') === 'local'),
+            CURLOPT_SSL_VERIFYHOST => !(env('APP_ENV') === 'local')
         );
 
         $curl_options = array();
