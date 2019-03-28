@@ -45,6 +45,8 @@ return [
 
 Then populate the `url` field with the **root url** of the targeted Prestashop installation and `token` field with the API token obtained from Prestashop control panel in Web Service section. If `debug` is `true` Prestashop will return debug information when responding to API requests.
 
+Use `APP_ENV=local` in `.env`, placed on root folder in order to ignore SSL certificate validation locally.
+
 Usage
 -----
 
