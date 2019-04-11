@@ -63,7 +63,7 @@ class PrestashopWebServiceLibrary
         $this->key = $key;
         $this->debug = $debug;
         $this->version = 'unknown';
-        
+
         $this->runningInConsole = app()->runningInConsole();
     }
 
@@ -134,8 +134,8 @@ class PrestashopWebServiceLibrary
             CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
             CURLOPT_USERPWD => $this->key.':',
             CURLOPT_HTTPHEADER => array( 'Expect:' ),
-            CURLOPT_SSL_VERIFYPEER => !(env('APP_ENV') === 'local'),
-            CURLOPT_SSL_VERIFYHOST => !(env('APP_ENV') === 'local')
+            CURLOPT_SSL_VERIFYPEER => config('APP_ENV') === 'local' ? 0 : 1,
+            CURLOPT_SSL_VERIFYHOST => config('APP_ENV') === 'local' ? 0 : 2 // value 1 is not accepted https://curl.haxx.se/libcurl/c/CURLOPT_SSL_VERIFYHOST.html
         );
 
         $curl_options = array();
