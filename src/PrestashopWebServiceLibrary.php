@@ -350,7 +350,7 @@ class PrestashopWebServiceLibrary
                 $url .= '/'.$options['id'];
             }
 
-            $params = array('filter', 'display', 'sort', 'limit', 'id_shop', 'id_group_shop','date');
+            $params = array('filter', 'display', 'sort', 'limit', 'id_shop', 'id_group_shop','date', 'price');
             foreach ($params as $p) {
                 foreach ($options as $k => $o) {
                     if (strpos($k, $p) !== false) {
