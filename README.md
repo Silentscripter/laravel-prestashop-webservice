@@ -9,7 +9,7 @@ Installation
 Require this package with composer using the following command:
 
 ```shell
-composer require protechstudio/laravel-prestashop-webservice
+composer require anglerfox/laravel-prestashop-webservice
 ```
 
 After updating composer, add the service provider to the `providers` array in `config/app.php`
