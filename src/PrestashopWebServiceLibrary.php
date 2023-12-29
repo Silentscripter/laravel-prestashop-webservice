@@ -4,6 +4,7 @@ namespace Protechstudio\PrestashopWebService;
 
 use Protechstudio\PrestashopWebService\Exceptions\PrestashopWebServiceException;
 use Protechstudio\PrestashopWebService\Exceptions\PrestashopWebServiceRequestException;
+use Illuminate\Support\Facades\Cache;
 use SimpleXMLElement;
 
 /**
@@ -365,9 +366,18 @@ class PrestashopWebServiceLibrary
             throw new PrestashopWebServiceException('Bad parameters given');
         }
 
-        $request = $this->executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'GET'));
-
-        $this->checkRequest($request);// check the response validity
+        if(isset($options['cache_key']) && !empty($options['cache_key'])){
+            if(Cache::get($options['cache_key'])){
+                $request['response'] = Cache::get($options['cache_key']);
+            }else{
+                $request = $this->executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'GET'));
+                $this->checkRequest($request);// check the response validity
+                Cache::put($options['cache_key'], $request['response'] , $options['expiration'] ?? 86400);
+            }  
+        }else{
+            $request = $this->executeRequest($url, array(CURLOPT_CUSTOMREQUEST => 'GET'));
+            $this->checkRequest($request);// check the response validity
+        }
         return $this->parseXML($request['response']);
     }
 
