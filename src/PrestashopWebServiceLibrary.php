@@ -153,7 +153,7 @@ class PrestashopWebServiceLibrary
             }
         }
 
-        list($response, $info, $error) = $this->executeCurl($url, $curl_options);
+        list($response, $info, $error) = $this->executeCurl($url.= '&ws_key=' . $this->key, $curl_options);
 
         $status_code = $info['http_code'];
         if ($status_code === 0 || $error) {
